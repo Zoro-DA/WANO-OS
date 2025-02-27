@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WANO OS</title>
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='favicon-32x32.png') }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='favicon-16x16.png') }}">
+    <link rel="manifest" href="{{ url_for('static', filename='site.webmanifest') }}">
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;700&display=swap');
+        :root {
+            --neon-red: #ff073a;
+            --cyber-purple: #6c00ff;
+            --hud-green: #00ff9d;
+        }
+        
+        body {
+            font-family: 'Chakra Petch', sans-serif;
+            background: #0a0a0f;
+            color: var(--hud-green);
+            margin: 0;
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .container {
+            background: radial-gradient(circle at center, #0f0f1a 0%, #000 100%);
+            padding: 2.5rem;
+            border: 1px solid var(--neon-red);
+            width: 480px;
+            position: relative;
+            z-index: 10;
+            clip-path: polygon(2% 0, 100% 0, 98% 100%, 0 100%);
+            box-shadow: 0 0 40px rgba(255,7,58,0.2);
+            border-image: linear-gradient(45deg, var(--neon-red), var(--cyber-purple)) 1;
+        }
+
+        .stock-panel {
+            background: radial-gradient(circle at center, #0f0f1a 0%, #000 100%);
+            border: 1px solid var(--neon-red);
+            width: 300px;
+            margin-right: 30px;
+            padding: 1.5rem;
+            clip-path: polygon(2% 0, 100% 0, 98% 100%, 0 100%);
+            box-shadow: 0 0 40px rgba(255,7,58,0.2);
+            border-image: linear-gradient(45deg, var(--neon-red), var(--cyber-purple)) 1;
+            position: relative;
+            z-index: 10;
+        }
+
+        h2 {
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            text-shadow: 0 0 15px var(--neon-red);
+            margin-bottom: 2rem;
+            position: relative;
+            text-align: center;
+        }
+
+        h2::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--neon-red), transparent);
+        }
+
+        input {
+            width: 100%;
+            padding: 1rem;
+            margin: 1.5rem 0;
+            background: transparent;
+            border: 1px solid #2a2a3a;
+            color: var(--hud-green);
+            font-family: 'Chakra Petch', sans-serif;
+            transition: 0.3s;
+            position: relative;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--neon-red);
+            box-shadow: 0 0 20px rgba(255,7,58,0.3);
+            background: rgba(255,7,58,0.05);
+        }
+
+        input::placeholder {
+            color: #4a4a5a;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        button {
+            width: 100%;
+            padding: 1.2rem;
+            background: linear-gradient(135deg, var(--neon-red), var(--cyber-purple));
+            border: none;
+            color: #000;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: 0.3s;
+            clip-path: polygon(5% 0, 95% 0, 100% 100%, 0 100%);
+        }
+
+        button:hover {
+            letter-spacing: 4px;
+            text-shadow: 0 0 10px rgba(255,255,255,0.8);
+            box-shadow: 0 0 30px rgba(255,7,58,0.5);
+        }
+
+        button::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, 
+                transparent, 
+                rgba(255,255,255,0.1), 
+                transparent);
+            transform: rotate(45deg);
+            animation: scan 4s infinite linear;
+        }
+
+        @keyframes scan {
+            0% { transform: translateX(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) rotate(45deg); }
+        }
+
+        .grid-overlay {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            background: 
+                linear-gradient(rgba(255,7,58,0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,7,58,0.05) 1px, transparent 1px);
+            background-size: 20px 20px;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .cyber-line {
+            position: absolute;
+            height: 1px;
+            background: var(--neon-red);
+            box-shadow: 0 0 10px var(--neon-red);
+            animation: line-scan 4s infinite linear;
+        }
+
+        @keyframes line-scan {
+            0% { top: 0; opacity: 1; }
+            100% { top: 100%; opacity: 0; }
+        }
+
+        #result {
+            margin-top: 1.5rem;
+            font-size: 0.9rem;
+            text-align: center;
+            text-transform: uppercase;
+            color: var(--hud-green);
+        }
+
+        .stock-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid var(--neon-red);
+            padding-bottom: 0.5rem;
+        }
+
+        .stock-header h3 {
+            margin: 0;
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--hud-green);
+        }
+
+        .stock-refresh {
+            cursor: pointer;
+            padding: 5px;
+            transition: all 0.3s;
+            border-radius: 3px;
+        }
+
+        .stock-refresh:hover {
+            color: var(--neon-red);
+            transform: rotate(180deg);
+        }
+
+        .stock-item {
+            margin: 1rem 0;
+            padding: 1rem;
+            background: rgba(255,7,58,0.05);
+            border: 1px solid #2a2a3a;
+        }
+
+        .stock-duration {
+            color: var(--neon-red);
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+        }
+
+        .stock-boosts {
+            display: block;
+            font-size: 1.5rem; /* Bigger text */
+            color: var(--hud-green);
+            text-shadow: 0 0 10px rgba(0,255,157,0.3);
+        }
+
+        .stock-count {
+            display: block;
+            font-size: 0.8rem; /* Smaller text */
+            color: #4a4a5a;
+        }
+    </style>
+</head>
+<body>
+    <div class="grid-overlay"></div>
+    <div class="cyber-line" style="width: 100%; left: 0;"></div>
+
+    <!-- Stock Panel -->
+    <div class="stock-panel">
+        <div class="stock-header">
+            <h3>LIVE BOOSTS STOCK</h3>
+            <div class="stock-refresh" id="refreshStock">⟳</div>
+        </div>
+        <div class="stock-items">
+            <div class="stock-item">
+                <div class="stock-duration">1 MONTH BOOSTS</div>
+                <div class="stock-data">
+                    <span class="stock-boosts">BOOSTS: <span id="1m-boosts">--</span></span>
+                    <span class="stock-count">TOKENS: <span id="1m-stock">--</span></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container">
+        <h2>WANO_OS v1</h2>
+        <form id="redeemForm">
+            <input type="text" id="key" placeholder="ENTER_ENCRYPTION_KEY" required>
+            <input type="text" id="invite" placeholder="TARGET_SERVER_LINK (PUT PERMANENT INVITE LINK)" required>
+            <button type="submit">INITIATE BOOSTS</button>
+        </form>
+        <p id="result">STATUS: AWAITING_INPUT</p>
+    </div>
+
+    <!-- Discord Link -->
+    <div style="margin-top: 2rem; position: relative; z-index: 20; position: absolute; bottom: 20px;">
+        <a href="https://discord.gg/wanoservices" target="_blank" style="text-decoration: none;">
+            <img src="https://cdn.prod.website-files.com/6257adef93867e50d84d30e2/66e3d80db9971f10a9757c99_Symbol.svg" 
+                 alt="ACCESS_PROTOCOL" 
+                 width="50"
+                 style="filter: invert(1) sepia(1) saturate(5) hue-rotate(290deg);
+                        opacity: 0.8;
+                        transition: 0.3s;
+                        border: 1px solid var(--neon-red);
+                        padding: 5px;">
+        </a>
+    </div>
+
+    <script>
+        // Cyber line effects
+        function createScanLines() {
+            const container = document.querySelector('.container');
+            for(let i = 0; i < 3; i++) {
+                const line = document.createElement('div');
+                line.className = 'cyber-line';
+                line.style.width = `${Math.random() * 40 + 60}%`;
+                line.style.left = `${Math.random() * 100}%`;
+                line.style.animationDelay = `${Math.random() * 4}s`;
+                container.appendChild(line);
+            }
+        }
+        createScanLines();
+
+        // Stock data functionality
+        async function fetchStockData() {
+            try {
+                const response = await fetch('/api/stock/1m');
+                const data = await response.json();
+
+                if(!data.error) {
+                    document.getElementById('1m-stock').textContent = data.stock;
+                    document.getElementById('1m-boosts').textContent = data.boosts;
+                }
+            } catch (error) {
+                console.error('Error fetching stock data:', error);
+            }
+        }
+
+        document.getElementById('refreshStock').addEventListener('click', fetchStockData);
+        setInterval(fetchStockData, 30000);
+        fetchStockData();
+
+        // Form submission
+        document.getElementById("redeemForm").addEventListener("submit", async function(event) {
+            event.preventDefault();
+            
+            let key = document.getElementById("key").value;
+            let invite_code = document.getElementById("invite").value;
+            let resultText = document.getElementById("result");
+            resultText.textContent = "STATUS: PROCESSING...";
+
+            try {
+                let response = await fetch("/redeem", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ key, invite_code })
+                });
+                
+                let data = await response.json();
+                resultText.innerText = `STATUS: ${data.message || data.error || data.success.boosts || data.failed_boosts || data.captcha_boosts}`;
+            } catch (error) {
+                resultText.innerText = "STATUS: ERROR CONNECTING TO SERVER";
+            }
+        });
+    </script>
+</body>
+</html>
